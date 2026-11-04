@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.16)
+project(string_diff LANGUAGES CXX)
+
+add_executable(diff diff.cpp)
+target_compile_features(diff PRIVATE cxx_std_17)
+set_target_properties(diff PROPERTIES CXX_EXTENSIONS OFF)
+if(MSVC)
+    target_compile_options(diff PRIVATE /W4)
+else()
+    target_compile_options(diff PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+include(CTest)
+if(BUILD_TESTING)
+    find_package(Python3 COMPONENTS Interpreter)
+    if(Python3_Interpreter_FOUND)
+        add_test(NAME diff_cases COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_diff.py" "$<TARGET_FILE:diff>")
+    endif()
+endif()
